@@ -1,10 +1,13 @@
 package com.sintie.amoba;
 
+import  java.util.ArrayList;
+import java.util.List;
 public class Board {
     private final int rows;
     private final int cols;
     private final char[][] board;
     private final char EMPTY = ' ';
+    private boolean isFirstMove = true;
 
     public Board(Configuration config) {
         this.rows = config.rows;
@@ -49,10 +52,15 @@ public class Board {
     }
 
     public boolean isValidMove(int row, int col) {
-        return row >= 0 && row < rows &&
-                col >= 0 && col < cols &&
-                board[row][col] == EMPTY;
+        if (isFirstMove) {
+            return isValidFirstMove(row, col);
+        } else {
+            return row >= 0 && row < rows &&
+                    col >= 0 && col < cols &&
+                    board[row][col] == EMPTY;
+        }
     }
+
 
     public void placeMark(int row, int col, char symbol) {
         if (isValidMove(row, col)) {
@@ -96,4 +104,24 @@ public class Board {
     public int getCols() {
         return cols;
     }
+    private boolean isValidFirstMove(int row, int col) {
+        List<Integer> validRows = new ArrayList<>();
+        if (rows % 2 == 0) {
+            validRows.add(rows / 2);
+        }
+        validRows.add(rows / 2 + 1);
+
+        List<Integer> validCols = new ArrayList<>();
+        if (cols % 2 == 0) {
+            validCols.add(cols / 2);
+        }
+        validCols.add(cols / 2 + 1);
+
+        if (validRows.contains(row + 1) && validCols.contains(col + 1) && board[row][col] == EMPTY) {
+            isFirstMove = false;
+            return true;
+        }
+        return false;
+    }
+
 }
