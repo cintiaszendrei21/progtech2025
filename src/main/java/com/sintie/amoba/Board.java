@@ -1,5 +1,6 @@
 package com.sintie.amoba;
 
+import java.awt.geom.Point2D;
 import  java.util.ArrayList;
 import java.util.List;
 public class Board {
@@ -7,6 +8,7 @@ public class Board {
     private final int cols;
     private final char[][] board;
     private final char EMPTY = ' ';
+    private List<Point2D> validMoves = new ArrayList<>();
     private boolean isFirstMove = true;
 
     public Board(Configuration config) {
@@ -65,6 +67,7 @@ public class Board {
     public void placeMark(int row, int col, char symbol) {
         if (isValidMove(row, col)) {
             board[row][col] = symbol;
+            refreshValidMoves();
         }
     }
 
@@ -123,5 +126,37 @@ public class Board {
         }
         return false;
     }
+    private void refreshValidMoves() {
+        validMoves.clear();
 
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (board[row][col] != EMPTY) {
+                    refreshValidMovesNearTo(row, col);
+                }
+            }
+        }
+    }
+
+    private void refreshValidMovesNearTo(int row, int col) {
+        int[] checks = {-1, 0, 1};
+
+        for (int dRow : checks) {
+            int rowIndex = row + dRow;
+            for (int dCol : checks) {
+                int colIndex = col + dCol;
+
+                if (rowIndex >= 0 && rowIndex < rows &&
+                        colIndex >= 0 && colIndex < cols &&
+                        board[rowIndex][colIndex] == EMPTY) {
+
+                    Point2D validField = new Point2D.Double(rowIndex, colIndex);
+
+                    if (!validMoves.contains(validField)) {
+                        validMoves.add(validField);
+                    }
+                }
+            }
+        }
+    }
 }
